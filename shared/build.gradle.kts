@@ -49,6 +49,9 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
+            implementation(libs.exo.player)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -59,6 +62,17 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.no.arg)
+            implementation(libs.multiplatform.settings.make.observable)
+
+            implementation(libs.sprite.kmp)
+
+            implementation(libs.compose.icons.feather)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
