@@ -3,7 +3,9 @@ package com.deepak.game.domain
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-
+/**
+ * Data class to manage the game screen
+ * */
 data class Game(
     val screenWidth: Int = 0,
     val screenHeight: Int = 0,
