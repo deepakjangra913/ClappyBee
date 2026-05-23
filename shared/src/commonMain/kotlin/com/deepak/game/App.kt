@@ -1,21 +1,37 @@
 package com.deepak.game
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameMillis
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import clappybee.shared.generated.resources.Res
 import clappybee.shared.generated.resources.background
+import com.deepak.game.domain.Game
+import com.deepak.game.domain.GameStatus
 import com.deepak.game.util.ChewyFontFamily
 import org.jetbrains.compose.resources.painterResource
 
@@ -23,6 +39,22 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun App() {
     MaterialTheme {
+        var screenWidth by remember { mutableStateOf(0) }
+        var screenHeight by remember { mutableStateOf(0) }
+        var game by remember { mutableStateOf(Game()) }
+
+        LaunchedEffect(Unit) {
+            game.start()
+        }
+
+        LaunchedEffect(Unit) {
+            while (game.status == GameStatus.Started) {
+                withFrameMillis {
+                    game.updateGameProgress()
+                }
+            }
+        }
+
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 modifier = Modifier.fillMaxSize(),
@@ -30,25 +62,71 @@ fun App() {
                 contentDescription = "Background",
                 contentScale = ContentScale.Crop
             )
+        }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 48.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "BEST: 0",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = ChewyFontFamily(),
-                    fontSize = MaterialTheme.typography.displaySmall.fontSize
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    val size = it.size
+                    if (screenWidth != size.width || screenHeight != size.height) {
+                        screenWidth = size.width
+                        screenHeight = size.height
+                        game = game.copy(
+                            screenWidth = size.width,
+                            screenHeight = size.height
+                        )
+                    }
+                }.clickable {
+                    if (game.status == GameStatus.Started) {
+                        game.jump()
+                    }
+                }
+        ) {
+            drawCircle(
+                color = Color.Blue,
+                radius = game.bee.radius,
+                center = Offset(
+                    x = game.bee.x,
+                    y = game.bee.y
                 )
+            )
+        }
 
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 48.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "BEST: 0",
+                fontWeight = FontWeight.Bold,
+                fontFamily = ChewyFontFamily(),
+                fontSize = MaterialTheme.typography.displaySmall.fontSize
+            )
+
+            Text(
+                text = "0",
+                fontWeight = FontWeight.Bold,
+                fontFamily = ChewyFontFamily(),
+                fontSize = MaterialTheme.typography.displaySmall.fontSize
+            )
+        }
+
+        if (game.status == GameStatus.Over){
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Black.copy(alpha = 0.5f)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
                 Text(
-                    text = "0",
+                    text = "Game Over!",
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontFamily = ChewyFontFamily(),
-                    fontSize = MaterialTheme.typography.displaySmall.fontSize
+                    fontSize = MaterialTheme.typography.displayMedium.fontSize
                 )
             }
         }
