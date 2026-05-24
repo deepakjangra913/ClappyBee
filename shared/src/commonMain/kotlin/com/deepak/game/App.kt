@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
@@ -73,9 +75,17 @@ fun App() {
         val currentFrame by spriteState.currentFrame.collectAsStateWithLifecycle()
         val animatedAngle by animateFloatAsState(
             targetValue = when {
-                game.beeVelocity > game.bee
+                (game.beeVelocity > game.beeMaxVelocity / 1.1) -> 30f
+                else -> 0f
             }
         )
+
+        DisposableEffect(Unit){
+            onDispose {
+                spriteState.stop()
+                spriteState.cleanup()
+            }
+        }
 
         LaunchedEffect(Unit) {
             game.start()
@@ -122,17 +132,20 @@ fun App() {
                 }
         ) {
             rotate(
-                degrees =,
-                pivot =
-            ){
+                degrees = animatedAngle,
+                pivot = Offset(
+                    x = game.bee.x - game.beeRadius,
+                    y = game.bee.y - game.beeRadius
+                )
+            ) {
                 drawSpriteView(
                     spriteState = spriteState,
                     spriteSpec = spriteSpec,
                     currentFrame = currentFrame,
                     image = sheetImage,
                     offset = IntOffset(
-                        x = game.bee.x.toInt(),
-                        y = game.bee.y.toInt()
+                        x = (game.bee.x - game.beeRadius).toInt(),
+                        y = (game.bee.y - game.beeRadius).toInt()
                     )
                 )
             }

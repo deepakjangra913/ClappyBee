@@ -10,6 +10,7 @@ data class Game(
     val screenWidth: Int = 0,
     val screenHeight: Int = 0,
     val gravity: Float = 0.8f,
+    val beeRadius: Float = 30f,
     val beeJumpImpulse: Float = -12f,
     val beeMaxVelocity: Float = 25f
 ) {
@@ -23,7 +24,8 @@ data class Game(
     var bee by mutableStateOf(
         Bee(
             (screenWidth / 4).toFloat(),
-            y = (screenHeight / 2).toFloat()
+            y = (screenHeight / 2).toFloat(),
+            radius = beeRadius
         )
     )
         private set
