@@ -9,8 +9,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,11 +45,14 @@ import clappybee.shared.generated.resources.background
 import clappybee.shared.generated.resources.bee_sprite
 import com.deepak.game.domain.Game
 import com.deepak.game.domain.GameStatus
+import com.deepak.game.ui.orange
 import com.deepak.game.util.ChewyFontFamily
 import com.stevdza_san.sprite.component.drawSpriteView
 import com.stevdza_san.sprite.domain.SpriteSheet
 import com.stevdza_san.sprite.domain.SpriteSpec
 import com.stevdza_san.sprite.domain.rememberSpriteState
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.Play
 import org.jetbrains.compose.resources.painterResource
 
 const val BEE_FRAME_SIZE = 80
@@ -80,16 +90,11 @@ fun App() {
             }
         )
 
-        DisposableEffect(Unit){
+        DisposableEffect(Unit) {
             onDispose {
                 spriteState.stop()
                 spriteState.cleanup()
             }
-        }
-
-        LaunchedEffect(Unit) {
-            game.start()
-            spriteState.start()
         }
 
         LaunchedEffect(game.status) {
@@ -170,6 +175,41 @@ fun App() {
                 fontFamily = ChewyFontFamily(),
                 fontSize = MaterialTheme.typography.displaySmall.fontSize
             )
+        }
+
+        if (game.status == GameStatus.Idle) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    modifier = Modifier.height(54.dp),
+                    shape = RoundedCornerShape(size = 20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = orange
+                    ),
+                    onClick = {
+                        game.start()
+                        spriteState.start()
+                    }
+                ) {
+                    Icon(
+                        imageVector = FeatherIcons.Play,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = "START",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontFamily = ChewyFontFamily()
+                    )
+                }
+            }
         }
 
         if (game.status == GameStatus.Over) {
