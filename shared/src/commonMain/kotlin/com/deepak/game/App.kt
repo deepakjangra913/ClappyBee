@@ -53,6 +53,7 @@ import com.stevdza_san.sprite.domain.SpriteSpec
 import com.stevdza_san.sprite.domain.rememberSpriteState
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Play
+import compose.icons.feathericons.RefreshCw
 import org.jetbrains.compose.resources.painterResource
 
 const val BEE_FRAME_SIZE = 80
@@ -227,6 +228,40 @@ fun App() {
                     fontFamily = ChewyFontFamily(),
                     fontSize = MaterialTheme.typography.displayMedium.fontSize
                 )
+                Text(
+                    text = "SCORE: 0",
+                    color = Color.White,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontFamily = ChewyFontFamily()
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    modifier = Modifier.height(54.dp),
+                    shape = RoundedCornerShape(size = 20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = orange
+                    ),
+                    onClick = {
+                        game.restart()
+                        spriteState.start()
+                    }
+                ) {
+                    Icon(
+                        imageVector = FeatherIcons.RefreshCw,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = "RESTART",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontFamily = ChewyFontFamily()
+                    )
+                }
             }
         }
     }
