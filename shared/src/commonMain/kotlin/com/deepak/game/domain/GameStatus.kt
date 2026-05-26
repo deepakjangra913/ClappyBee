@@ -1,8 +1,14 @@
 package com.deepak.game.domain
 
 /**
-* Enum class to differentiate the Game Status
-* */
+ * Represents the current state of the game.
+ *
+ * Used to control gameplay flow and UI rendering.
+ *
+ * - [Idle] → initial state before gameplay starts
+ * - [Started] → game is actively running
+ * - [Over] → game has ended
+ */
 enum class GameStatus {
     Idle,
     Started,
