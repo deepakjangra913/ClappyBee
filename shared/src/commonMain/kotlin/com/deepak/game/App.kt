@@ -64,6 +64,39 @@ import compose.icons.feathericons.Play
 import compose.icons.feathericons.RefreshCw
 import org.jetbrains.compose.resources.painterResource
 
+/**
+ * Main entry point for the Clappy Bee game UI.
+ *
+ * This composable renders the complete game screen including:
+ *
+ * - Static and animated background layers
+ * - Bee sprite animation
+ * - Tap interaction for jumping
+ * - Game score UI
+ * - Start overlay
+ * - Game over overlay with restart action
+ *
+ * The game state is maintained via [Game], which controls:
+ * - Bee position and velocity
+ * - Game progress updates
+ * - Collision handling
+ * - Current [GameStatus]
+ *
+ * UI behavior:
+ * - Tapping anywhere on the canvas while the game is running makes the bee jump
+ * - Background continuously scrolls horizontally while the game is active
+ * - Bee rotation animates based on vertical velocity
+ * - Sprite animation starts on game start and stops on game over
+ *
+ * Lifecycle:
+ * - Sprite resources are cleaned up automatically when the composable leaves composition
+ * - Game progress is updated frame-by-frame using [withFrameMillis]
+ *
+ * Game states:
+ * - [GameStatus.Idle] → shows Start button
+ * - [GameStatus.Started] → runs gameplay loop
+ * - [GameStatus.Over] → shows Game Over screen and Restart button
+ */
 const val BEE_FRAME_SIZE = 80
 
 @Preview
