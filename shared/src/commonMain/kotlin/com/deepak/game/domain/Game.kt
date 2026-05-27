@@ -3,6 +3,8 @@ package com.deepak.game.domain
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Velocity
+import kotlin.random.Random
 
 /**
  * Holds the core game state and gameplay logic for Clappy Bee.
@@ -40,7 +42,10 @@ data class Game(
     val gravity: Float = 0.8f,
     val beeRadius: Float = 30f,
     val beeJumpImpulse: Float = -12f,
-    val beeMaxVelocity: Float = 25f
+    val beeMaxVelocity: Float = 25f,
+    val pipeWidth: Float = 150f,
+    val pipeVelocity: Float = 5f,
+    val pipeGapSize: Float = 250f
 ) {
 
     var status by mutableStateOf(GameStatus.Idle)
@@ -57,6 +62,8 @@ data class Game(
         )
     )
         private set
+
+    var pipePairs = mutableListOf<PipePair>()
 
 
     /** Starts the game loop. */
@@ -82,9 +89,14 @@ data class Game(
         beeVelocity = 0f
     }
 
+    private fun removePipes(){
+        pipePairs.clear()
+    }
+
     /** Ends the game and switches to Game Over state. */
     fun restart() {
         resetBeePosition()
+        removePipes()
         start()
     }
 
@@ -102,6 +114,27 @@ data class Game(
         bee = bee.copy(
             y = bee.y + beeVelocity
         )
+
+        spawnPipes()
+    }
+
+    private fun spawnPipes() {
+        pipePairs.forEach { it.x -= pipeVelocity }
+        pipePairs.removeAll { it.x + pipeWidth < 0 }
+
+        if (pipePairs.isEmpty() || pipePairs.last().x < screenWidth / 2){
+            val initialPipeX = screenWidth.toFloat() + pipeWidth
+            val topHeight = Random.nextFloat() * (screenHeight / 2)
+            val bottomHeight = screenHeight - topHeight - pipeGapSize
+            val newPipePair = PipePair(
+                x = initialPipeX,
+                y = topHeight + pipeGapSize / 2,
+                topHeight = topHeight,
+                bottomHeight = bottomHeight
+            )
+
+            pipePairs.add(newPipePair)
+        }
     }
 
     /** Ends the game and switches to Game Over state. */
