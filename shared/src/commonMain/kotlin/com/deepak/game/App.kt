@@ -99,6 +99,7 @@ import org.jetbrains.compose.resources.painterResource
  * - [GameStatus.Over] → shows Game Over screen and Restart button
  */
 const val BEE_FRAME_SIZE = 80
+const val PIPE_CAP_HEIGHT = 50f
 
 @Preview
 @Composable
