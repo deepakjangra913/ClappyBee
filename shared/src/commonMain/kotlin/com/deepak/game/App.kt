@@ -46,12 +46,15 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import clappybee.shared.generated.resources.Res
 import clappybee.shared.generated.resources.background
 import clappybee.shared.generated.resources.bee_sprite
 import clappybee.shared.generated.resources.moving_background
+import clappybee.shared.generated.resources.pipe
+import clappybee.shared.generated.resources.pipe_cap
 import com.deepak.game.domain.Game
 import com.deepak.game.domain.GameStatus
 import com.deepak.game.ui.orange
@@ -63,7 +66,9 @@ import com.stevdza_san.sprite.domain.rememberSpriteState
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Play
 import compose.icons.feathericons.RefreshCw
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.PI
 
 /**
  * Main entry point for the Clappy Bee game UI.
@@ -154,6 +159,8 @@ fun App() {
 
         val backgroundOffsetX = remember { Animatable(0f) }
         var imageWidth by remember { mutableStateOf(0) }
+        val pipeImage = imageResource(Res.drawable.pipe)
+        val pipeCapImage = imageResource(Res.drawable.pipe_cap)
 
         LaunchedEffect(game.status){
             while (game.status == GameStatus.Started){
@@ -250,22 +257,49 @@ fun App() {
             }
 
             game.pipePairs.forEach { pipePair ->
-                drawRect(
-                    color = Color.Blue,
-                    topLeft = Offset(
-                        x = pipePair.x - game.pipeWidth / 2,
-                        y = 0f
+                drawImage(
+                    image = pipeImage,
+                    dstOffset = IntOffset(
+                        x = (pipePair.x - game.pipeWidth / 2).toInt(),
+                        y = 0
                     ),
-                    size = Size(game.pipeWidth, pipePair.topHeight)
+                    dstSize = IntSize(
+                        width = game.pipeWidth.toInt(),
+                        height = (pipePair.topHeight - PIPE_CAP_HEIGHT).toInt()
+                    )
                 )
-
-                drawRect(
-                    color = Color.Blue,
-                    topLeft = Offset(
-                        x = pipePair.x - game.pipeWidth / 2,
-                        y = pipePair.y + game.pipeGapSize / 2
+                drawImage(
+                    image = pipeCapImage,
+                    dstOffset = IntOffset(
+                        x = (pipePair.x - game.pipeWidth / 2).toInt(),
+                        y = (pipePair.topHeight - PIPE_CAP_HEIGHT).toInt()
                     ),
-                    size = Size(game.pipeWidth, pipePair.bottomHeight)
+                    dstSize = IntSize(
+                        width = game.pipeWidth.toInt(),
+                        height = PIPE_CAP_HEIGHT.toInt()
+                    )
+                )
+                drawImage(
+                    image = pipeCapImage,
+                    dstOffset = IntOffset(
+                        x = (pipePair.x - game.pipeWidth / 2).toInt(),
+                        y = (pipePair.y + game.pipeGapSize / 2).toInt()
+                    ),
+                    dstSize = IntSize(
+                        width = game.pipeWidth.toInt(),
+                        height = PIPE_CAP_HEIGHT.toInt()
+                    )
+                )
+                drawImage(
+                    image = pipeImage,
+                    dstOffset = IntOffset(
+                        x = (pipePair.x - game.pipeWidth / 2).toInt(),
+                        y = (pipePair.y + game.pipeGapSize / 2 + PIPE_CAP_HEIGHT).toInt()
+                    ),
+                    dstSize = IntSize(
+                        width = game.pipeWidth.toInt(),
+                        height = (pipePair.bottomHeight - PIPE_CAP_HEIGHT).toInt()
+                    )
                 )
             }
         }
