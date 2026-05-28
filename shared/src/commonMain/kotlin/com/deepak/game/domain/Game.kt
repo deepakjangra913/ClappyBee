@@ -3,7 +3,6 @@ package com.deepak.game.domain
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Velocity
 import kotlin.random.Random
 
 /**
@@ -89,7 +88,7 @@ data class Game(
         beeVelocity = 0f
     }
 
-    private fun removePipes(){
+    private fun removePipes() {
         pipePairs.clear()
     }
 
@@ -102,6 +101,12 @@ data class Game(
 
     /** Ends the game and switches to Game Over state. */
     fun updateGameProgress() {
+        pipePairs.forEach { pipePair ->
+            if (isCollision(pipePair)){
+                gameOver()
+                return
+            }
+        }
         if (bee.y < 0) {
             stopBee()
             return
@@ -122,7 +127,7 @@ data class Game(
         pipePairs.forEach { it.x -= pipeVelocity }
         pipePairs.removeAll { it.x + pipeWidth < 0 }
 
-        if (pipePairs.isEmpty() || pipePairs.last().x < screenWidth / 2){
+        if (pipePairs.isEmpty() || pipePairs.last().x < screenWidth / 2) {
             val initialPipeX = screenWidth.toFloat() + pipeWidth
             val topHeight = Random.nextFloat() * (screenHeight / 2)
             val bottomHeight = screenHeight - topHeight - pipeGapSize
@@ -135,6 +140,27 @@ data class Game(
 
             pipePairs.add(newPipePair)
         }
+    }
+
+    private fun isCollision(pipePair: PipePair): Boolean {
+        // Check horizontal collision. Bee overlaps the pipe's X range
+        val beeRightEdge = bee.x + bee.radius
+        val beeLeftEdge = bee.x - bee.radius
+        val pipeLeftEdge = pipePair.x - pipeWidth / 2
+        val pipeRightEdge = pipePair.x - pipeWidth / 2
+        val horizontalCollision = beeRightEdge > pipeLeftEdge
+                && beeLeftEdge < pipeRightEdge
+
+        // Check if bee is with in the vertical gap
+        val beeTopEdge = bee.y - bee.radius
+        val beeBottomEdge = bee.y - bee.radius
+        val gapTopEdge = pipePair.y - pipeGapSize / 2
+        val gapBottomEdge = pipePair.y + pipeGapSize / 2
+
+        val beeInGap = beeTopEdge > gapTopEdge
+                && beeBottomEdge < gapBottomEdge
+
+        return horizontalCollision && !beeInGap
     }
 
     /** Ends the game and switches to Game Over state. */
