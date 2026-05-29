@@ -16,6 +16,6 @@ val sharedModule = module {
 
 fun initializeKoin() {
     startKoin {
-        modules()
+        modules(sharedModule)
     }
 }

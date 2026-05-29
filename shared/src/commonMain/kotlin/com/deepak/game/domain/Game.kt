@@ -3,6 +3,9 @@ package com.deepak.game.domain
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.russhwolf.settings.ObservableSettings
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.random.Random
 
 /**
@@ -35,6 +38,8 @@ import kotlin.random.Random
  * @property beeJumpImpulse Upward velocity applied when the player taps.
  * @property beeMaxVelocity Maximum vertical speed allowed for the bee.
  */
+
+const val SCORE_KEY = "best_score"
 data class Game(
     val screenWidth: Int = 0,
     val screenHeight: Int = 0,
@@ -45,7 +50,9 @@ data class Game(
     val pipeWidth: Float = 150f,
     val pipeVelocity: Float = 5f,
     val pipeGapSize: Float = 250f
-) {
+) : KoinComponent {
+
+    private val settings: ObservableSettings by inject()
 
     var status by mutableStateOf(GameStatus.Idle)
         private set
@@ -63,16 +70,39 @@ data class Game(
         private set
 
     var pipePairs = mutableListOf<PipePair>()
+    var currentScore by mutableStateOf(0)
+        private set
+    var bestScore by mutableStateOf(0)
+        private set
 
+    init {
+        bestScore = settings.getInt(
+            key = SCORE_KEY,
+            defaultValue = 0
+        )
+        settings.addIntListener(
+            key = SCORE_KEY,
+            defaultValue = 0
+        ){
+            bestScore = it
+        }
+    }
 
     /** Starts the game loop. */
     fun start() {
         status = GameStatus.Started
     }
 
+    private fun saveScore(){
+        if (bestScore < currentScore){
+            settings.putInt(key = SCORE_KEY, currentScore)
+        }
+    }
+
     /** Ends the game and switches to Game Over state. */
     fun gameOver() {
         status = GameStatus.Over
+        saveScore()
     }
 
     /** Ends the game and switches to Game Over state. */
@@ -96,6 +126,7 @@ data class Game(
     fun restart() {
         resetBeePosition()
         removePipes()
+        resetScore()
         start()
     }
 
@@ -105,6 +136,11 @@ data class Game(
             if (isCollision(pipePair)){
                 gameOver()
                 return
+            }
+
+            if(!pipePair.scored && bee.x > pipePair.x + pipeWidth / 2){
+                pipePair.scored = true
+                currentScore += 1
             }
         }
         if (bee.y < 0) {
@@ -121,6 +157,10 @@ data class Game(
         )
 
         spawnPipes()
+    }
+
+    fun resetScore(){
+        currentScore = 0
     }
 
     private fun spawnPipes() {
