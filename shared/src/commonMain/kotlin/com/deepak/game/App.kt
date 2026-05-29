@@ -9,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,12 +32,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
@@ -66,9 +66,9 @@ import com.stevdza_san.sprite.domain.rememberSpriteState
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Play
 import compose.icons.feathericons.RefreshCw
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import kotlin.math.PI
 
 /**
  * Main entry point for the Clappy Bee game UI.
@@ -130,6 +130,7 @@ fun App() {
             )
         }
 
+        val coroutineScope = rememberCoroutineScope()
         val sheetImage = spriteSpec.imageBitmap
         val currentFrame by spriteState.currentFrame.collectAsStateWithLifecycle()
         val animatedAngle by animateFloatAsState(
@@ -162,10 +163,10 @@ fun App() {
         val pipeImage = imageResource(Res.drawable.pipe)
         val pipeCapImage = imageResource(Res.drawable.pipe_cap)
 
-        LaunchedEffect(game.status){
-            while (game.status == GameStatus.Started){
+        LaunchedEffect(game.status) {
+            while (game.status == GameStatus.Started) {
                 backgroundOffsetX.animateTo(
-                    targetValue = - imageWidth.toFloat(),
+                    targetValue = -imageWidth.toFloat(),
                     animationSpec = infiniteRepeatable(
                         animation = tween(
                             durationMillis = 4000,
@@ -192,13 +193,16 @@ fun App() {
                     .fillMaxSize()
                     .onSizeChanged {
                         imageWidth = it.width
-                    }
-                    .offset {
-                        IntOffset(
-                            x = backgroundOffsetX.value.toInt(),
-                            y = 0
-                        )
-                    },
+                    }.then(
+                        if (game.status == GameStatus.Started) {
+                            Modifier.basicMarquee(
+                                initialDelayMillis = 0,
+                                velocity = 50.dp
+                            )
+                        } else {
+                            Modifier
+                        }
+                    ),
                 painter = painterResource(Res.drawable.moving_background),
                 contentDescription = "Background",
                 contentScale = ContentScale.FillHeight
@@ -206,12 +210,16 @@ fun App() {
             Image(
                 modifier = Modifier
                     .fillMaxSize()
-                    .offset {
-                        IntOffset(
-                            x = backgroundOffsetX.value.toInt() + imageWidth,
-                            y = 0
-                        )
-                    },
+                    .then(
+                        if (game.status == GameStatus.Started) {
+                            Modifier.basicMarquee(
+                                initialDelayMillis = 0,
+                                velocity = 50.dp
+                            )
+                        } else {
+                            Modifier
+                        }
+                    ),
                 painter = painterResource(Res.drawable.moving_background),
                 contentDescription = "Background",
                 contentScale = ContentScale.FillHeight
@@ -341,6 +349,9 @@ fun App() {
                     onClick = {
                         game.start()
                         spriteState.start()
+                        coroutineScope.launch {
+                            backgroundOffsetX.snapTo(0f)
+                        }
                     }
                 ) {
                     Icon(
