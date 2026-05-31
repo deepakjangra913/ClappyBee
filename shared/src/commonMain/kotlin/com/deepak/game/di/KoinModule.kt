@@ -23,6 +23,6 @@ fun initializeKoin(
 ) {
     startKoin {
         config?.invoke(this)
-        modules(sharedModule)
+        modules(sharedModule, targetModule)
     }
 }

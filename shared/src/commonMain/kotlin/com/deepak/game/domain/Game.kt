@@ -52,6 +52,7 @@ data class Game(
     val pipeGapSize: Float = 250f
 ) : KoinComponent {
 
+    private val audioPlayer: AudioPlayer by inject()
     private val settings: ObservableSettings by inject()
 
     var status by mutableStateOf(GameStatus.Idle)
@@ -91,6 +92,7 @@ data class Game(
     /** Starts the game loop. */
     fun start() {
         status = GameStatus.Started
+        audioPlayer.playGameSoundInLoop()
     }
 
     private fun saveScore(){
@@ -102,12 +104,14 @@ data class Game(
     /** Ends the game and switches to Game Over state. */
     fun gameOver() {
         status = GameStatus.Over
+        audioPlayer.stopGameSound()
         saveScore()
     }
 
     /** Ends the game and switches to Game Over state. */
     fun jump() {
         beeVelocity = beeJumpImpulse
+        audioPlayer.playJumpSound()
     }
 
     /** Ends the game and switches to Game Over state. */
@@ -207,5 +211,9 @@ data class Game(
     fun stopBee() {
         beeVelocity = 0f
         bee = bee.copy(y = 0f)
+    }
+
+    fun cleanUp(){
+        audioPlayer.release()
     }
 }

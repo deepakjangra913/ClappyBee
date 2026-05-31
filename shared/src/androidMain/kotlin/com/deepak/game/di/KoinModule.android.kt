@@ -1,6 +1,11 @@
 package com.deepak.game.di
 
-import org.koin.core.module.Module
+import com.deepak.game.domain.AudioPlayer
+import org.koin.android.ext.koin.androidContext
+import org.koin.dsl.module
 
-actual val targetModule: Module
-    get() = TODO("Not yet implemented")
+actual val targetModule = module {
+    single<AudioPlayer> {
+        AudioPlayer(context = androidContext())
+    }
+}
