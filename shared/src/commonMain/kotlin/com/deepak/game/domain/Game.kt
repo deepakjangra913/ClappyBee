@@ -76,6 +76,8 @@ data class Game(
     var bestScore by mutableStateOf(0)
         private set
 
+    private var isFallingSoundPlayed = false
+
     init {
         bestScore = settings.getInt(
             key = SCORE_KEY,
@@ -84,7 +86,7 @@ data class Game(
         settings.addIntListener(
             key = SCORE_KEY,
             defaultValue = 0
-        ){
+        ) {
             bestScore = it
         }
     }
@@ -95,8 +97,8 @@ data class Game(
         audioPlayer.playGameSoundInLoop()
     }
 
-    private fun saveScore(){
-        if (bestScore < currentScore){
+    private fun saveScore() {
+        if (bestScore < currentScore) {
             settings.putInt(key = SCORE_KEY, currentScore)
         }
     }
@@ -106,12 +108,14 @@ data class Game(
         status = GameStatus.Over
         audioPlayer.stopGameSound()
         saveScore()
+        isFallingSoundPlayed = false
     }
 
     /** Ends the game and switches to Game Over state. */
     fun jump() {
         beeVelocity = beeJumpImpulse
         audioPlayer.playJumpSound()
+        isFallingSoundPlayed = false
     }
 
     /** Ends the game and switches to Game Over state. */
@@ -132,17 +136,18 @@ data class Game(
         removePipes()
         resetScore()
         start()
+        isFallingSoundPlayed = false
     }
 
     /** Ends the game and switches to Game Over state. */
     fun updateGameProgress() {
         pipePairs.forEach { pipePair ->
-            if (isCollision(pipePair)){
+            if (isCollision(pipePair)) {
                 gameOver()
                 return
             }
 
-            if(!pipePair.scored && bee.x > pipePair.x + pipeWidth / 2){
+            if (!pipePair.scored && bee.x > pipePair.x + pipeWidth / 2) {
                 pipePair.scored = true
                 currentScore += 1
             }
@@ -160,10 +165,18 @@ data class Game(
             y = bee.y + beeVelocity
         )
 
+        // When to play the falling sound
+        if (beeVelocity > (beeMaxVelocity / 1.1)) {
+            if (isFallingSoundPlayed) {
+                audioPlayer.playFallingSound()
+                isFallingSoundPlayed = true
+            }
+        }
+
         spawnPipes()
     }
 
-    fun resetScore(){
+    fun resetScore() {
         currentScore = 0
     }
 
@@ -213,7 +226,7 @@ data class Game(
         bee = bee.copy(y = 0f)
     }
 
-    fun cleanUp(){
+    fun cleanUp() {
         audioPlayer.release()
     }
 }
