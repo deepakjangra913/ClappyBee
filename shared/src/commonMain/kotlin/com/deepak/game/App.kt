@@ -60,6 +60,7 @@ import com.deepak.game.domain.Game
 import com.deepak.game.domain.GameStatus
 import com.deepak.game.ui.orange
 import com.deepak.game.util.ChewyFontFamily
+import com.deepak.game.util.getPlatform
 import com.stevdza_san.sprite.component.drawSpriteView
 import com.stevdza_san.sprite.domain.SpriteSheet
 import com.stevdza_san.sprite.domain.SpriteSpec
@@ -111,9 +112,10 @@ const val PIPE_CAP_HEIGHT = 50f
 @Composable
 fun App() {
     MaterialTheme {
+        val platform = remember { getPlatform() }
         var screenWidth by remember { mutableStateOf(0) }
         var screenHeight by remember { mutableStateOf(0) }
-        var game by remember { mutableStateOf(Game()) }
+        var game by remember { mutableStateOf(Game(platform)) }
 
         val spriteState = rememberSpriteState(
             totalFrames = 9,
@@ -244,7 +246,7 @@ fun App() {
                 }.clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
-                ){
+                ) {
                     if (game.status == GameStatus.Started) {
                         game.jump()
                     }
