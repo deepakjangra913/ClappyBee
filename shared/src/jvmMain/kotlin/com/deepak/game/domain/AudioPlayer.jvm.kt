@@ -9,35 +9,47 @@ import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 import kotlin.concurrent.thread
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class AudioPlayer {
     private val audioCache = mutableMapOf<String, ByteArray>()
     private val playingLines = mutableMapOf<String, SourceDataLine>()
 
     actual fun playGameOverSound() {
+        stopFallingSound()
+        playSound(fileName = "game_over.wav")
     }
 
     actual fun playJumpSound() {
+        stopFallingSound()
+        playSound(fileName = "jump.wav")
     }
 
     actual fun playFallingSound() {
+        playSound(fileName = "falling.wav")
     }
 
     actual fun stopFallingSound() {
+        stopSound(fileName = "falling.wav")
     }
 
     actual fun playGameSoundInLoop() {
+        playSound(fileName = "game_sound.wav", loop = true)
     }
 
     actual fun stopGameSound() {
+        playGameOverSound()
+        stopSound("game_sound.wav")
     }
 
     actual fun release() {
+        audioCache.clear()
+        stopAllSounds()
     }
 
     private fun playSound(fileName: String, loop: Boolean = false) {
         thread {
             try {
-                val audioData = audioCache[fileName] ?: loadAudioFiles(fileName).also {
+                val audioData = audioCache[fileName] ?: loadAudioFile(fileName).also {
                     audioCache[fileName] = it
                 }
 
@@ -53,38 +65,33 @@ actual class AudioPlayer {
                     playingLines[fileName] = line
                 }
 
-                val buffer = ByteArray(4076)
-                var byteRead = 0
+                val buffer = ByteArray(4096)
+                var bytesRead = 0
                 var shouldContinue = true
 
                 if (loop) {
                     while (shouldContinue) {
                         inputStream.reset()
                         while (shouldContinue && inputStream.read(buffer)
-                                .also { byteRead = it } != -1
+                                .also { bytesRead = it } != -1
                         ) {
                             synchronized(playingLines) {
                                 shouldContinue = playingLines.containsKey(fileName)
                             }
-                        }
-
-                        if (shouldContinue) {
-                            line.write(buffer, 0, byteRead)
+                            if (shouldContinue) {
+                                line.write(buffer, 0, bytesRead)
+                            }
                         }
                     }
                 } else {
-                    while (shouldContinue) {
-                        inputStream.reset()
-                        while (shouldContinue && inputStream.read(buffer)
-                                .also { byteRead = it } != -1
-                        ) {
-                            synchronized(playingLines) {
-                                shouldContinue = playingLines.containsKey(fileName)
-                            }
+                    while (shouldContinue && inputStream.read(buffer)
+                            .also { bytesRead = it } != -1
+                    ) {
+                        synchronized(playingLines) {
+                            shouldContinue = playingLines.containsKey(fileName)
                         }
-
                         if (shouldContinue) {
-                            line.write(buffer, 0, byteRead)
+                            line.write(buffer, 0, bytesRead)
                         }
                     }
 
@@ -120,11 +127,18 @@ actual class AudioPlayer {
         }
     }
 
-    private fun loadAudioFiles(fileName: String): ByteArray {
-        val resourcePath = Paths.get("src/commonMain/composeResources/files/$fileName")
-        if (!Files.exists(resourcePath)) {
-            throw FileNotFoundException("Resource not found: $resourcePath")
-        }
-        return FileInputStream(resourcePath.toFile()).use { it.readBytes() }
+    private fun loadAudioFile(fileName: String): ByteArray {
+        val path =
+            "composeResources/clappybee.shared.generated.resources/files/$fileName"
+
+        println(
+            this::class.java.classLoader?.getResource(path)
+        )
+
+        val resourceStream =
+            this::class.java.classLoader?.getResourceAsStream(path)
+                ?: throw FileNotFoundException("Resource not found: $path")
+
+        return resourceStream.use { it.readBytes() }
     }
 }
