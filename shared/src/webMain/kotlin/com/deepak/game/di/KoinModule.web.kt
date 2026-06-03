@@ -1,4 +1,8 @@
 package com.deepak.game.di
 
-actual val targetModule: org.koin.core.module.Module
-    get() = TODO("Not yet implemented")
+import com.deepak.game.domain.AudioPlayer
+import org.koin.dsl.module
+
+actual val targetModule = module {
+    single<AudioPlayer> { AudioPlayer() }
+}
