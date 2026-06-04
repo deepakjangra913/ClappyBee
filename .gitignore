@@ -1,6 +1,7 @@
 *.iml
 .kotlin
 .gradle
+!webApp/build/dist/wasmJs/productionExecutable/**
 **/build/
 xcuserdata
 !src/**/build/
