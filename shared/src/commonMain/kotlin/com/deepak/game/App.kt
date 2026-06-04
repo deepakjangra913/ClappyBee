@@ -196,7 +196,7 @@ fun App() {
                 modifier = Modifier.fillMaxSize(),
                 painter = painterResource(Res.drawable.background),
                 contentDescription = "Background",
-                contentScale = ContentScale.FillHeight
+                contentScale = ContentScale.Crop
             )
             Image(
                 modifier = Modifier
