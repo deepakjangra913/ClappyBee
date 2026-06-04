@@ -1,5 +1,6 @@
 package com.deepak.game.domain
 
+import clappybee.shared.generated.resources.Res
 import org.w3c.dom.Audio
 
 actual class AudioPlayer {
@@ -66,7 +67,7 @@ actual class AudioPlayer {
     }
 
     private fun createAudioElements(fileName: String): Audio {
-        val path = "src/commonMain/composeResources/files/$fileName"
+        val path = Res.getUri("files/$fileName")
         return Audio(path).apply {
             onerror = { _, _, _, _, _ ->
 
