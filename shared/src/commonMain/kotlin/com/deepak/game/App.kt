@@ -60,6 +60,7 @@ import com.deepak.game.domain.Game
 import com.deepak.game.domain.GameStatus
 import com.deepak.game.ui.orange
 import com.deepak.game.util.ChewyFontFamily
+import com.deepak.game.util.Platform
 import com.deepak.game.util.getPlatform
 import com.stevdza_san.sprite.component.drawSpriteView
 import com.stevdza_san.sprite.domain.SpriteSheet
@@ -173,7 +174,12 @@ fun App() {
                     targetValue = -imageWidth.toFloat(),
                     animationSpec = infiniteRepeatable(
                         animation = tween(
-                            durationMillis = 4000,
+                            durationMillis = when(platform) {
+                                Platform.Android,
+                                Platform.iOS -> 4000
+                                Platform.Desktop -> 7000
+                                Platform.Web -> 5000
+                            },
                             easing = LinearEasing
                         ),
                         repeatMode = RepeatMode.Restart

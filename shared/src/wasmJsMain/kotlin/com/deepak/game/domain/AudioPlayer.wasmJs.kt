@@ -70,7 +70,7 @@ actual class AudioPlayer {
         return Audio(path).apply {
             onerror = { _, _, _, _, _ ->
 
-                print("Error loading audio file: $path")
+                println("Error loading audio file: $path")
                 null
             }
         }

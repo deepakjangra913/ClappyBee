@@ -4,5 +4,7 @@ import com.deepak.game.domain.AudioPlayer
 import org.koin.dsl.module
 
 actual val targetModule = module {
-    single<AudioPlayer> { AudioPlayer() }
+    single<AudioPlayer> {
+        AudioPlayer()
+    }
 }
