@@ -67,7 +67,7 @@ actual class AudioPlayer {
     }
 
     private fun createAudioElements(fileName: String): Audio {
-        val path = Res.getUri("files/$fileName")
+        val path = "composeResources/clappybee.webapp.generated.resources/files/$fileName"
         return Audio(path).apply {
             onerror = { _, _, _, _, _ ->
 
