@@ -1,6 +1,5 @@
 package com.deepak.game.domain
 
-import clappybee.shared.generated.resources.Res
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.w3c.dom.Audio
 
@@ -69,7 +68,13 @@ actual class AudioPlayer {
 
     @OptIn(ExperimentalResourceApi::class)
     private fun createAudioElements(fileName: String): Audio {
-        val path = Res.getUri("files/$fileName")
+        val path = "src/commonMain/composeResources/files/$fileName"
+        return Audio(path).apply {
+            onerror = { _, _, _, _, _ ->
+                println("Error loading audio file: $path")
+                null
+            }
+        }
 
         return Audio(path)
     }
