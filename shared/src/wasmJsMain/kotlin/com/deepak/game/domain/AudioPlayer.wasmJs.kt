@@ -68,7 +68,7 @@ actual class AudioPlayer {
 
     @OptIn(ExperimentalResourceApi::class)
     private fun createAudioElements(fileName: String): Audio {
-        val path = "src/commonMain/composeResources/files/$fileName"
+        val path = "composeResources/clappybee.shared.generated.resources/files/$fileName"
         return Audio(path).apply {
             onerror = { _, _, _, _, _ ->
                 println("Error loading audio file: $path")
