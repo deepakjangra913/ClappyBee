@@ -1,8 +1,8 @@
 *.iml
 .kotlin
 .gradle
-**/build/
 !webApp/build/dist/wasmJs/productionExecutable/**
+**/build/
 xcuserdata
 !src/**/build/
 local.properties
