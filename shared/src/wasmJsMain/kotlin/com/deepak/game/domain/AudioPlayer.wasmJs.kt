@@ -77,7 +77,5 @@ actual class AudioPlayer {
                 null
             }
         }
-
-        return Audio(path)
     }
 }
