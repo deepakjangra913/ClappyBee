@@ -9,6 +9,29 @@ import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 import kotlin.concurrent.thread
 
+/**
+ * Loads an audio file from the Compose Multiplatform resources packaged
+ * inside the Desktop application's JAR.
+ *
+ * Audio assets are located under:
+ *
+ * `composeResources/clappybee.shared.generated.resources/files/`
+ *
+ * The method uses the application's class loader to access the resource
+ * stream at runtime, allowing audio playback to work both when running
+ * from the IDE and from a packaged desktop distribution.
+ *
+ * Loaded audio data is returned as a [ByteArray] and cached by the caller
+ * to avoid repeatedly reading the same resource from disk/JAR.
+ *
+ * @param fileName Name of the audio file to load
+ * (for example, `jump.wav`, `falling.wav`, or `game_over.wav`).
+ *
+ * @return Raw audio file bytes.
+ *
+ * @throws FileNotFoundException If the requested audio resource cannot
+ * be found in the packaged application resources.
+ */
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class AudioPlayer {
     private val audioCache = mutableMapOf<String, ByteArray>()
