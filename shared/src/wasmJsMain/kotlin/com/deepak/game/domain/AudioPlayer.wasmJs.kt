@@ -3,6 +3,23 @@ package com.deepak.game.domain
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.w3c.dom.Audio
 
+/**
+ * Creates and returns an HTML audio element for the given audio file.
+ *
+ * Audio files are packaged inside Compose Multiplatform resources and are
+ * available in the generated resources directory at runtime:
+ *
+ * `composeResources/clappybee.shared.generated.resources/files/`
+ *
+ * The created [Audio] element is configured with an error callback to log
+ * resource loading failures, which helps diagnose missing or incorrectly
+ * packaged audio assets in WebAssembly builds.
+ *
+ * @param fileName Name of the audio file located under the `files` resource
+ * directory (for example, `jump.wav` or `game_over.wav`).
+ *
+ * @return Configured [Audio] instance for playback.
+ */
 actual class AudioPlayer {
 
     private val audioElements = mutableMapOf<String, Audio>()
