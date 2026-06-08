@@ -8,6 +8,22 @@ import androidx.media3.exoplayer.ExoPlayer
 import clappybee.shared.generated.resources.Res
 import com.deepak.game.shared.R
 
+/**
+ * Android implementation of [AudioPlayer].
+ *
+ * Uses:
+ * - [SoundPool] for short, low-latency sound effects such as jump,
+ *   falling, and game over sounds.
+ * - [ExoPlayer] for looping background game music playback.
+ *
+ * Audio resources are loaded from the Android application's raw resources
+ * and Compose Multiplatform resources. The player manages the lifecycle of
+ * audio components and provides platform-specific playback behavior for
+ * the Android target.
+ *
+ * @param context Android context used to initialize audio resources and
+ * media playback components.
+ */
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class AudioPlayer(context: Context) {
     private val loopingPlayer = ExoPlayer.Builder(context).build()
